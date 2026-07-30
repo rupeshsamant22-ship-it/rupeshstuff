@@ -1225,6 +1225,20 @@
     }
   }
 
+  function triggerAutoplay() {
+    if (isSynthPlaying || (audio.src && !audio.paused)) return;
+    if (audio.src && audio.src !== window.location.href) {
+      audio.play().then(() => {
+        playBtn.textContent = '❚❚';
+        playerArt.classList.add('playing');
+      }).catch(err => {
+        console.log('Autoplay waiting for user gesture:', err);
+      });
+    } else {
+      startSynthMelody();
+    }
+  }
+
   function openEnvelope() {
     if (cover.classList.contains('open')) return;
     cover.classList.add('open');
@@ -1233,6 +1247,7 @@
     setTimeout(() => { flash.classList.add('show'); }, 700);
     setTimeout(() => {
       showPage('card');
+      triggerAutoplay();
     }, 1100);
     setTimeout(() => { flash.classList.remove('show'); }, 1450);
   }
@@ -1357,6 +1372,7 @@
         const fileName = candidatePaths[i].split('/').pop().replace(/\.[^/.]+$/, '');
         songTitle.textContent = fileName === 'song' || fileName === 'music' ? 'Our Special Song' : fileName;
         songSub.textContent = 'Loaded from local audio folder';
+        if (cover.classList.contains('open')) triggerAutoplay();
       };
       testAudio.onerror = () => tryNext(i + 1);
     }
